@@ -107,5 +107,3 @@ public abstract class AbstractObjectLoader<R> extends AsyncTaskLoader<R> {
     }
 
 }
-
-

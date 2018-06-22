@@ -18,6 +18,8 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.method.ScrollingMovementMethod;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ScrollView;
@@ -117,13 +119,13 @@ public class GpsActivity extends AppCompatActivity {
     public void onClickStartGPS(View view) {
         Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
         int year, month, day, hour, min, sec;
-        year = calendar.get(Calendar.YEAR);
+        year = calendar.get(Calendar.YEAR) - 2000;
         month = calendar.get(Calendar.MONTH);
         day = calendar.get(Calendar.DAY_OF_MONTH);
         hour = calendar.get(Calendar.HOUR);
         min = calendar.get(Calendar.MINUTE);
         sec = calendar.get(Calendar.SECOND);
-        m_NazovCesty = String.format("Cesta_%d-%02d-%02d__%02d-%02d-%02d", year, month, day, hour, min, sec);
+        m_NazovCesty = String.format("Cesta_%02d%02d%02d_%02d%02d%02d", year, month, day, hour, min, sec);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
                 || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             locationManager.requestLocationUpdates("gps", m_minTime, m_minDist, listener);
@@ -146,7 +148,7 @@ public class GpsActivity extends AppCompatActivity {
                 id_Gps1 = dbHelper.InsertGps1(db, m_NazovCesty);
                 MainActivity.g_Cesta_ID = id_Gps1;
             }
-            dbHelper.InsertGps2(db, id_Gps1, l.getLatitude(), l.getLongitude(), l.getAltitude());
+            dbHelper.InsertGps2(db, id_Gps1, l.getLatitude(), l.getLongitude(), l.getAltitude(), 0);
             iLockDB = 0;
         }
         db.close();
@@ -183,5 +185,37 @@ public class GpsActivity extends AppCompatActivity {
             }
             return;
         }
+    }
+
+    public void onBack(View view) {
+        locationManager.removeUpdates(listener);
+        finish();
+    }
+
+    //========== Action bar =======
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.gps_cesta_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int itemId = item.getItemId();
+
+        if (itemId == R.id.startGPS) {
+            onClickStartGPS(null);
+        }
+
+        if (itemId == R.id.stopGPS) {
+            onClickStopGPS(null);
+        }
+
+        if (itemId == R.id.btnBack) {
+            onBack(null);
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }

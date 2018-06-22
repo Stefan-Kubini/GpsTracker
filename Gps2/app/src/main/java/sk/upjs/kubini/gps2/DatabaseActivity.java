@@ -1,7 +1,10 @@
 package sk.upjs.kubini.gps2;
 
+import android.app.LoaderManager;
 import android.content.ContentValues;
+import android.content.CursorLoader;
 import android.content.DialogInterface;
+import android.content.Loader;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
@@ -11,6 +14,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ScrollView;
@@ -20,8 +25,10 @@ import java.util.UUID;
 
 import sk.upjs.kubini.gps2.provider.DatabaseOpenHelper;
 import sk.upjs.kubini.gps2.provider.Defaults;
+import sk.upjs.kubini.gps2.provider.MyGPS1Contract;
 
-public class DatabaseActivity extends AppCompatActivity {
+public class DatabaseActivity extends AppCompatActivity  implements LoaderManager.LoaderCallbacks<Cursor>{
+    private static final int GPS1_LOADER = 3;
     private TextView textView;
     private ScrollView scrollView;
     private DatabaseOpenHelper dbHelper;
@@ -38,31 +45,7 @@ public class DatabaseActivity extends AppCompatActivity {
         dbHelper = new DatabaseOpenHelper(getApplicationContext());;
     }
     public void onClickSelectGPS1(View view) {
-        String strText;
-        textView.setText("");
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        if (db != null) {
-            Cursor cur = db.rawQuery("select _ID, Nazov, TimeStamp, UUIDHelp from GPS1 order by _ID", null);
-            if (cur != null) {
-                strText = "";
-                if (cur.moveToFirst()) {
-                    do {
-                        int id     = cur.getInt(0);
-                        String nazov = cur.getString(1);
-                        String strTimeStamp = cur.getString(2);
-                        String uuidHelp = cur.getString(3);
-                        String strRiadok = String.format("%d %s %s %s\n", id, nazov, strTimeStamp, uuidHelp);
-                        strText += strRiadok;
-                    } while (cur.moveToNext());
-                }
-                cur.close();
-                textView.setText(strText);
-            }
-            db.close();
-        }
-        else {
-            textView.append("db is null\n");
-        }
+        getLoaderManager().initLoader(GPS1_LOADER, Bundle.EMPTY, this);
     }
 
     public void onClickSelectGPS2(View view) {
@@ -121,7 +104,7 @@ public class DatabaseActivity extends AppCompatActivity {
     public void onClickDeleteAllGPS(View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("VYMAZAT");
-        builder.setMessage("Vymazat vsetky cesty?");
+        builder.setMessage("Vymazať všetky cesty?");
 
         builder.setPositiveButton("Ano", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
@@ -148,9 +131,9 @@ public class DatabaseActivity extends AppCompatActivity {
     public void onClickInsertPrimaryData(View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Primarne data");
-        builder.setMessage("Chcete vlozit primarne data(t.j. 2 cesty)?");
+        builder.setMessage("Chcete vložiť primárne dáta(t.j. 2 cesty)?");
 
-        builder.setPositiveButton("Ano", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("Áno", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
             SQLiteDatabase db = dbHelper.getWritableDatabase();
             dbHelper.InsertPrimaryData(db);
@@ -171,9 +154,9 @@ public class DatabaseActivity extends AppCompatActivity {
     public void onClickCreateTables(View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Novo-vytvorenie tabuliek");
-        builder.setMessage("Chcete nanovo vytvorit databazove tabulky (vsetky data zmiznu)?");
+        builder.setMessage("Chcete nanovo vytvoriť databázové tabuľky (všetky dáta zmiznú)?");
 
-        builder.setPositiveButton("Ano", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("Áno", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
             SQLiteDatabase db = dbHelper.getWritableDatabase();
             dbHelper.CreateTables(db);
@@ -189,5 +172,76 @@ public class DatabaseActivity extends AppCompatActivity {
         });
         AlertDialog alert = builder.create();
         alert.show();
+    }
+
+    public void onBack(View view) {
+        finish();
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
+        if (id != GPS1_LOADER) {
+            throw new IllegalStateException("Invalid Loader with ID: " + id);
+        }
+        CursorLoader loader = new CursorLoader(this);
+        loader.setUri(MyGPS1Contract.GPS1.CONTENT_URI);
+        return loader;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cur) {
+        String strText;
+        textView.setText("");
+        if (cur != null) {
+            strText = "";
+            if (cur.moveToFirst()) {
+                do {
+                    int id     = cur.getInt(0);
+                    String nazov = cur.getString(1);
+                    String strTimeStamp = cur.getString(2);
+                    String uuidHelp = cur.getString(3);
+                    String strRiadok = String.format("%d %s %s %s\n", id, nazov, strTimeStamp, uuidHelp);
+                    strText += strRiadok;
+                } while (cur.moveToNext());
+            }
+            textView.setText(strText);
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+    }
+    //========== Action bar =======
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.sprava_databazy_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int itemId = item.getItemId();
+        if (itemId == R.id.btnBack) {
+            onBack(null);
+        }
+        if (itemId == R.id.insertPrimaryData) {
+            onClickInsertPrimaryData(null);
+        }
+        if (itemId == R.id.deleteAllGPS) {
+            onClickDeleteAllGPS(null);
+        }
+        if (itemId == R.id.selectGPSParam) {
+            onClickSelectGPSParam(null);
+        }
+        if (itemId == R.id.selectGPS2) {
+            onClickSelectGPS2(null);
+        }
+        if (itemId == R.id.selectGPS1) {
+            onClickSelectGPS1(null);
+
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }

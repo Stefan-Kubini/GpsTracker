@@ -12,7 +12,8 @@ public class struPocasie {
     public double mnozstvoZrazok = 0.0;
 
     public String toString() {
-        return casPocasia + " " + slovnyPopis + " " + tlak + " " + smerVetra + " " + rychlostVetra + " " + teplota + " " + vlhkost + " " + oblacnost + " " + mnozstvoZrazok;
+        return casPocasia + ", " + slovnyPopis + ", teplota: " + teplota + ", rychlost vetra: " + rychlostVetra + ", mnozstvo zrazok" + mnozstvoZrazok +
+                ", oblacnost: " + oblacnost + ", tlak: " + tlak + ", smer vetra: " + smerVetra + ", vlhkost: " + vlhkost;
 
     }
 }

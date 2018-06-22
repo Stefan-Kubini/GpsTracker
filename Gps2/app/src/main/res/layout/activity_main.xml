@@ -15,7 +15,7 @@
             android:onClick="onClickBtnGPS"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:text="Nova cesta"
+            android:text="Nová cesta"
             android:textSize="24sp"
             />
         <Button
@@ -23,15 +23,15 @@
             android:onClick="onClickBtnCesty"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:text="Zaznamenane cesty"
+            android:text="Zaznamenané cesty"
             android:textSize="24sp"
             />
         <Button
-            android:id="@+id/btnStiahnutMapu"
-            android:onClick="onClickBtnStiahnutMapu"
+            android:id="@+id/btnPozicia"
+            android:onClick="onClickBtnPozicia"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:text="Stiahnut mapu"
+            android:text="Lokálne info"
             android:textSize="24sp"
             />
         <Button
@@ -47,19 +47,9 @@
             android:onClick="onClickBtnDatabase"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:text="Sprava databazy"
-            android:textSize="24sp"
+            android:text="Správa databázy"
+            android:textSize="20sp"
             />
-
-        <Button
-            android:id="@+id/btnAktualnaPozicia"
-            android:onClick="onClickBtnAktualnaPozicia"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:text="Aktualna pozicia"
-            android:textSize="24sp"
-            />
-
         <Button
             android:id="@+id/btnKoniec"
             android:onClick="onClickBtnKoniec"
@@ -70,3 +60,8 @@
             />
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>
+
+
+
+
+

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rlid"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:weightSum="1"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:textSize="20sp"
+        android:layout_margin="1dp"
+        android:orientation="vertical"
+        android:scrollbars="vertical"
+        android:text="Sumarizacia cesty" />
+
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="400dp"
+            android:gravity="bottom"
+            android:orientation="vertical"
+            android:scrollbars="vertical"
+            android:layout_margin="1dp"
+            >
+            <LinearLayout
+                android:orientation="vertical"
+                android:id="@+id/view_drawing_pad"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textSize="16sp"
+            android:layout_margin="1dp"
+            android:orientation="vertical"
+            android:scrollbars="vertical"
+            android:text="Prejdena vzdialenost" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textSize="16sp"
+            android:layout_margin="1dp"
+            android:orientation="vertical"
+            android:scrollbars="vertical"
+            android:text="Priem. rychlost presunu zkmnxbxPriem. rychlost presunu zkmnxbxPriem. rychlost presunu zkmnxbxPriem. rychlost presunu zkmnxbxPriem. rychlost presunu zkmnxbxPriem. rychlost presunu zkmnxbxPriem. rychlost presunu zkmnxbxPriem. rychlost presunu zkmnxbxPriem. rychlost presunu zkmnxbxPriem. rychlost presunu zkmnxbxPriem. rychlost presunu zkmnxbxPriem. rychlost presunu zkmnxbxPriem. rychlost presunu zkmnxbxPriem. rychlost presunu zkmnxbxPriem. rychlost presunu zkmnxbx" />
+
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
+
+
+
+
+
+
+
+

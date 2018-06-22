@@ -1,5 +1,7 @@
 package sk.upjs.kubini.gps2.pocasieProvider;
 
+import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,11 +20,14 @@ import java.util.Scanner;
 
 public class WebPocasie {
 
-    public static String url = ""; //priklad: http://api.openweathermap.org/data/2.5/forecast?id=524901&APPID=a6008a92c95c0dfa186a75bd4cacb561
+//    public static String url = ""; //priklad: http://api.openweathermap.org/data/2.5/forecast?id=524901&APPID=a6008a92c95c0dfa186a75bd4cacb561
+    public static String url = "http://api.openweathermap.org/data/2.5/forecast?id=524901&APPID=a6008a92c95c0dfa186a75bd4cacb561";
 
     private URL serviceUrl;
 
-    public WebPocasie() {
+    public WebPocasie(double sirka, double dlzka) {
+        url = "http://api.openweathermap.org/data/2.5/forecast?lat=" + sirka + "&lon=" + dlzka + "&appid=a6008a92c95c0dfa186a75bd4cacb561";
+        Log.d("Pocasie ", url);
         try {
             this.serviceUrl = new URL(url);
         } catch (MalformedURLException e) {
@@ -30,21 +35,21 @@ public class WebPocasie {
         }
     }
 
-    public List<struPocasie> loadWeather(double sirka, double dlzka) {
-
-        url = "http://api.openweathermap.org/data/2.5/forecast?lat=" + sirka + "&lon=" + dlzka + "&appid=a6008a92c95c0dfa186a75bd4cacb561";
-
+    public List<String> loadWeather() {
         InputStream in = null;
         try {
             in = this.serviceUrl.openStream();
             String json = toString(in);
 
+            //Log.d("Pocasie ", "Dlzka vystupu " + json.length());
+
             JSONObject strana = new JSONObject(json);
             JSONArray casoveUseky = strana.getJSONArray("list");
 
             List<struPocasie> predpovedPocasia = new ArrayList<struPocasie>();
+            List<String> predpovedPocasiaStr = new ArrayList<>();
 
-            for(int i = 0; i < casoveUseky.length(); i++) {
+            for (int i = 0; i < casoveUseky.length(); i++) {
                 JSONObject polozka = casoveUseky.getJSONObject(i);
                 struPocasie elem = new struPocasie();
 
@@ -54,13 +59,17 @@ public class WebPocasie {
                 elem.smerVetra = polozka.getJSONObject("wind").getDouble("deg");
                 elem.slovnyPopis = polozka.getJSONArray("weather").getJSONObject(0).getString("description");
 
-                if(polozka.has("rain"))
-                    if(polozka.getJSONObject("rain").has("3h"))
-                        elem.mnozstvoZrazok =  polozka.getJSONObject("rain").getDouble("3h");
+                if (polozka.has("rain"))
+                    if (polozka.getJSONObject("rain").has("3h"))
+                        elem.mnozstvoZrazok = polozka.getJSONObject("rain").getDouble("3h");
+
 
                 double t1 = polozka.getJSONObject("main").getDouble("temp");
-                t1 = (5*(t1 + 459067)) / 9; //prevod na stupne celzia
-                elem.teplota = t1;
+
+                //prevod z farenheitov na stupne celzia
+                //t1 = (5 * (t1 + 459067)) / 9.0; //prevod na stupne celzia
+                //elem.teplota = t1;
+                elem.teplota = t1 -272.15; //prevod z kelvinov na stupne celzia
 
                 elem.vlhkost = polozka.getJSONObject("main").getInt("humidity");
                 elem.tlak = polozka.getJSONObject("main").getDouble("pressure");
@@ -69,14 +78,23 @@ public class WebPocasie {
                 //System.out.println(elem.toString());
             }
 
-            return predpovedPocasia;
+            for(int i=0; i<predpovedPocasia.size(); i++) {
+                if(i >= 10) break;
+                predpovedPocasiaStr.add(predpovedPocasia.get(i).toString());
+            }
+
+            //Log.d("Pocasie ", "Pocet poloziek " + predpovedPocasiaStr.size());
+            return predpovedPocasiaStr;
 
         } catch (IOException e) {
-            //Log.e(getClass().getName(), "I/O Exception while loading users", e);
+            Log.e(getClass().getName(), "I/O Exception while loading users", e);
             e.printStackTrace();
             return Collections.EMPTY_LIST;
         } catch (JSONException e) {
-            //Log.e(getClass().getName(), "JSON parsing error while loading users", e);
+            Log.e(getClass().getName(), "JSON parsing error while loading users", e);
+            e.printStackTrace();
+            return Collections.EMPTY_LIST;
+        } catch (Exception e) {
             e.printStackTrace();
             return Collections.EMPTY_LIST;
         } finally {
@@ -84,7 +102,7 @@ public class WebPocasie {
                 try {
                     in.close();
                 } catch (IOException e) {
-                    //Log.w(getClass().getName(), "Unable to close input stream", e);
+                    Log.w(getClass().getName(), "Unable to close input stream", e);
                     e.printStackTrace();
                 }
             }
@@ -100,47 +118,3 @@ public class WebPocasie {
         return sb.toString();
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

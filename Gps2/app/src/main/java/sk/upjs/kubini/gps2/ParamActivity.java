@@ -4,6 +4,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -59,4 +61,25 @@ public class ParamActivity extends AppCompatActivity {
     public void onCancelParams(View view) {
         super.onBackPressed();
     }
+
+    //========== Action bar =======
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.nastavenia_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int itemId = item.getItemId();
+        if (itemId == R.id.saveParams) {
+            onSaveParams(null);
+        }
+        if (itemId == R.id.cancelParams) {
+            onCancelParams(null);
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
 }

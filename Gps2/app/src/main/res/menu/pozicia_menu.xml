@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/hladajPoziciu"
+        android:icon="@android:drawable/ic_dialog_info"
+        android:title="Nájdi svoju pozíciu"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/zistitPocasie"
+        android:icon="@android:drawable/btn_star_big_on"
+        android:title="Zisti počasie"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/cancelActivity"
+        android:icon="@android:drawable/arrow_down_float"
+        android:title="Koniec"
+        app:showAsAction="ifRoom" />
+
+</menu>
+

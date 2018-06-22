@@ -16,6 +16,9 @@ import static sk.upjs.kubini.gps2.provider.Defaults.DEFAULT_CURSOR_FACTORY;
 public class DatabaseOpenHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "gps2db";
     public static final int DATABASE_VERSION = 5;
+    private double lastLat, lastLon, lastAlt;
+    private long lastPosunSec;
+    private long CASOVY_POSUN_MS = 10800000; // 3 hodiny posun od greenwichskeho casu
 
     public DatabaseOpenHelper(Context context) {
         super(context, DATABASE_NAME, DEFAULT_CURSOR_FACTORY, DATABASE_VERSION);
@@ -36,6 +39,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 // Pozn.: Kazda tabulda v SQLite ma automaticke implicitne pole rowid, ktore ma vlastnost "autoincrement".
 //        V pripade tabuliek GPS1, GPS2 databaza automaticky namiesto rowid pouzije _ID (lebo je "integer primary key") -
 //        vid dokumentacia SQLite na webe
+        InsertPrimaryData(db);
     }
 
     @Override
@@ -55,7 +59,7 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
 
         ContentValues contentValues = new ContentValues();
         contentValues.put("Nazov", nazov);
-        contentValues.put("TimeStamp", System.currentTimeMillis()); // / 1000);
+        contentValues.put("TimeStamp", System.currentTimeMillis() + CASOVY_POSUN_MS); // / 1000);
         contentValues.put("UUIDHelp", uuid);
         db.insert("GPS1", Defaults.NO_NULL_COLUMN_HACK, contentValues);
         String sql =  "select _ID from GPS1 where UUIDHelp = '" + uuid + "'";
@@ -69,13 +73,13 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
         return id;
     }
 
-    public void InsertGps2(SQLiteDatabase db, int id, double lat, double lon, double alt) {
+    public void InsertGps2(SQLiteDatabase db, int id, double lat, double lon, double alt, double posunSec) {
         ContentValues contentValues = new ContentValues();
         contentValues.put("_ID_GPS1", id);
         contentValues.put("Lat", lat);
         contentValues.put("Lon", lon);
         contentValues.put("Alt", alt);
-        contentValues.put("TimeStamp", System.currentTimeMillis()); // / 1000);
+        contentValues.put("TimeStamp", System.currentTimeMillis() + (posunSec * 1000) + CASOVY_POSUN_MS); // / 1000);
         db.insert("GPS2", Defaults.NO_NULL_COLUMN_HACK, contentValues);
     }
 
@@ -86,23 +90,48 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
         contentValues.put("MinDist", minDist);
         db.insert("GPSPARAM", Defaults.NO_NULL_COLUMN_HACK, contentValues);
     }
+
     public void InsertPrimaryData(SQLiteDatabase db) {
         int id;
 
+        InsertGpsParams(db, 6000, 0);
+
+        lastAlt = 200;
+        lastLat = 20.400;
+        lastLon = 40.200;
+        lastPosunSec = 0;
         id = InsertGps1(db, "Prvotna cesta1");
         if (id > 0) {
-            InsertGps2(db, id, 20.392, 49.234, 247);
-            InsertGps2(db, id, 20.391, 49.235, 251);
-            InsertGps2(db, id, 20.390, 49.236, 256);
-            InsertGps2(db, id, 20.390, 49.238, 252);
+            InsertGPS2_Interval(db, id, 0.001, 0.002, 2, 2, 10);
+            InsertGPS2_Interval(db, id, 0.002, -0.001, 1, 3, 8);
+            InsertGPS2_Interval(db, id, -0.001, 0.004, -2, 1, 9);
+            InsertGPS2_Interval(db, id, -0.001, 0.004, -2, 4, 5);
+            InsertGPS2_Interval(db, id, 0.001, 0.001, 2, 1, 1);
+            InsertGPS2_Interval(db, id, -0.001, 0.007, 1, 2, 5);
+            InsertGPS2_Interval(db, id, 0.001, 0.002, -2, 1, 3);
         }
         id = InsertGps1(db, "Prvotna cesta2");
         if (id > 0) {
-            InsertGps2(db, id, 20.492, 49.134, 347);
-            InsertGps2(db, id, 20.491, 49.135, 351);
-            InsertGps2(db, id, 20.490, 49.136, 356);
-            InsertGps2(db, id, 20.490, 49.138, 352);
+            InsertGPS2_Interval(db, id, 0.004, 0.002, 2, 2, 7);
+            InsertGPS2_Interval(db, id, 0.002, -0.001, 1, 3, 8);
+            InsertGPS2_Interval(db, id, -0.001, 0.004, -2, 1, 9);
+            InsertGPS2_Interval(db, id, 0.001, 0.002, -3, 2, 7);
+            InsertGPS2_Interval(db, id, 0.001, -0.002, 1, 3, 1);
+            InsertGPS2_Interval(db, id, -0.002, 0.004, -2, 4, 2);
+            InsertGPS2_Interval(db, id, 0.003, -0.002, 2, 2, 4);
+            InsertGPS2_Interval(db, id, 0.001, -0.001, 1, 3, 5);
+            InsertGPS2_Interval(db, id, -0.009, 0.010, -2, 1, 4);
         }
-        InsertGpsParams(db, 6000, 0);
+    }
+
+    private void InsertGPS2_Interval(SQLiteDatabase db, int id, double dLat, double dLon, double dAlt, long sec, int cnt) {
+        for (int i = 0; i < cnt; i++) {
+            InsertGps2(db, id, lastLat,  lastLon, lastAlt, lastPosunSec);
+            lastLat += dLat;
+            lastLon += dLon;
+            lastAlt += dAlt;
+            lastPosunSec += sec;
+        }
+
     }
 }

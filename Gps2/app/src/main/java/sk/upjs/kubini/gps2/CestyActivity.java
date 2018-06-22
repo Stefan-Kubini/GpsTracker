@@ -1,7 +1,11 @@
 package sk.upjs.kubini.gps2;
 
+import android.app.LoaderManager;
 import android.content.Context;
+import android.content.CursorLoader;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.Loader;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AlertDialog;
@@ -9,6 +13,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -21,12 +27,13 @@ import java.util.Calendar;
 import java.util.Locale;
 
 import sk.upjs.kubini.gps2.provider.DatabaseOpenHelper;
+import sk.upjs.kubini.gps2.provider.MyGPS1Contract;
 
-public class CestyActivity extends AppCompatActivity {
+public class CestyActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
+    private static final int GPS1_LOADER = 3;
     TextView nadpisView;
     ListView listViewCesty;
     ArrayList<Integer>   itemsID;
-    ArrayList<String>    items;
     ArrayList<ItemCesta> itemsCesty;
     String m_Nadpis;
 
@@ -38,14 +45,7 @@ public class CestyActivity extends AppCompatActivity {
         listViewCesty = (ListView) findViewById(R.id.list_view_items);
         itemsID    = new ArrayList<Integer>();
         itemsCesty = new ArrayList<ItemCesta>();
-
-        loadGPS1();
-
-        CestyListAdapter cestyListAdapter = new CestyListAdapter(getApplicationContext(), itemsCesty);
-        listViewCesty.setAdapter(cestyListAdapter);
-        listViewCesty.setOnItemClickListener(myListViewOnItemClickListener);
-
-        nadpisView.setText(m_Nadpis);
+        getLoaderManager().initLoader(GPS1_LOADER, Bundle.EMPTY, this);
     }
 
     private class ItemCesta {
@@ -102,63 +102,92 @@ public class CestyActivity extends AppCompatActivity {
         }
     }
     private String convertDateTime(long timeStamp) {
-        Calendar cal = Calendar.getInstance(Locale.ENGLISH);
+        Calendar cal = Calendar.getInstance(Locale.GERMANY);
         cal.setTimeInMillis(timeStamp);
         String strDateTime = DateFormat.format("dd-MM-yyyy hh:mm:ss", cal).toString();
         return strDateTime;
     }
-    public void loadGPS1() {
-// Prerobit na CursorLoader podla tohoto vzoru:
-// https://stackoverflow.com/questions/18326954/how-to-read-an-sqlite-db-in-android-with-a-cursorloader
-        DatabaseOpenHelper dbHelper;
-        String strRiadok;
-        int id;
-        String nazov;
-        long lTimeStamp;
-        String strDateTime;
-        int pocetCiest = 0;
-
-//        items.clear();
-        itemsID.clear();
-        itemsCesty.clear();
-        dbHelper = new DatabaseOpenHelper(getApplicationContext());;
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        if (db != null) {
-            Cursor cur = db.rawQuery("select _ID, Nazov, TimeStamp from GPS1 order by _ID DESC", null);
-            if (cur != null) {
-                if (cur.moveToFirst()) {
-                    do {
-                        id          = cur.getInt   (0);
-                        nazov       = cur.getString(1);
-                        lTimeStamp  = cur.getLong  (2);
-                        strDateTime = convertDateTime(lTimeStamp);
-                        itemsID.add(id);
-                        itemsCesty.add(new ItemCesta(id+" ",nazov, "   " + strDateTime));
-                        pocetCiest++;
-                    } while (cur.moveToNext());
-                }
-                cur.close();
-            }
-            db.close();
-        }
-        m_Nadpis = String.format("Zaznamenané cesty (%d)", pocetCiest);
+    public void SpustJednuCestu(int _ID) {
+        Intent intent = new Intent(this, JednaCestaActivity.class);
+        intent.putExtra("_ID", _ID); // prenos parametra do dalsej aktivity
+        startActivity(intent);
     }
 
     AdapterView.OnItemClickListener myListViewOnItemClickListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             int _ID = itemsID.get(position);
-
-            AlertDialog alertDialog = new AlertDialog.Builder(CestyActivity.this).create();
-            alertDialog.setTitle("Info");
-            alertDialog.setMessage("Kliknute ID cesty: " + _ID);
-            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-            alertDialog.show();
+            SpustJednuCestu(_ID);
         }
     };
+
+    public void onBack(View view) {
+        finish();
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
+        if (id != GPS1_LOADER) {
+            throw new IllegalStateException("Invalid Loader with ID: " + id);
+        }
+        CursorLoader loader = new CursorLoader(this);
+        loader.setUri(MyGPS1Contract.GPS1.CONTENT_URI);
+        return loader;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        String strRiadok;
+        int id;
+        String nazov;
+        long lTimeStamp;
+        String strDateTime;
+        int pocetCiest = 0;
+        String strCesty = "";
+
+        itemsID.clear();
+        itemsCesty.clear();
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                do {
+                    id          = cursor.getInt   (0);
+                    nazov       = cursor.getString(1);
+                    lTimeStamp  = cursor.getLong  (2);
+                    strDateTime = convertDateTime(lTimeStamp);
+                    strRiadok = String.format("%d, %s, %s\n", id, nazov, strDateTime);
+                    strCesty += strRiadok;
+                    pocetCiest++;
+                    itemsID.add(id);
+                    itemsCesty.add(new ItemCesta(id+" ",nazov, "   " + strDateTime));
+                } while (cursor.moveToNext());
+            }
+        }
+        m_Nadpis = String.format("Zaznamenané cesty (%d)", pocetCiest);
+        CestyListAdapter cestyListAdapter = new CestyListAdapter(getApplicationContext(), itemsCesty);
+        listViewCesty.setAdapter(cestyListAdapter);
+        listViewCesty.setOnItemClickListener(myListViewOnItemClickListener);
+        nadpisView.setText(m_Nadpis);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+    }
+
+    //========== Action bar =======
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.zaznamy_ciest_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int itemId = item.getItemId();
+        if (itemId == R.id.btnBack) {
+            onBack(null);
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 }

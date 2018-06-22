@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/btnPrevysenie"
+        android:icon="@android:drawable/ic_menu_add"
+        android:title="Prevýšenie"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/btnTrasa"
+        android:icon="@android:drawable/ic_dialog_info"
+        android:title="Trasa"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/btnBack"
+        android:icon="@android:drawable/arrow_up_float"
+        android:title="Späť"
+        app:showAsAction="ifRoom" />
+</menu>
