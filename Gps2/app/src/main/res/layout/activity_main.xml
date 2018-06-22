@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <Button
+            android:id="@+id/btnGPS"
+            android:onClick="onClickBtnGPS"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="Nova cesta"
+            android:textSize="24sp"
+            />
+        <Button
+            android:id="@+id/btnCesty"
+            android:onClick="onClickBtnCesty"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="Zaznamenane cesty"
+            android:textSize="24sp"
+            />
+        <Button
+            android:id="@+id/btnStiahnutMapu"
+            android:onClick="onClickBtnStiahnutMapu"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="Stiahnut mapu"
+            android:textSize="24sp"
+            />
+        <Button
+            android:id="@+id/btnNastavenia"
+            android:onClick="onClickBtnNastavenia"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="Nastavenia"
+            android:textSize="24sp"
+            />
+        <Button
+            android:id="@+id/btnDatabase"
+            android:onClick="onClickBtnDatabase"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="Sprava databazy"
+            android:textSize="24sp"
+            />
+
+        <Button
+            android:id="@+id/btnAktualnaPozicia"
+            android:onClick="onClickBtnAktualnaPozicia"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="Aktualna pozicia"
+            android:textSize="24sp"
+            />
+
+        <Button
+            android:id="@+id/btnKoniec"
+            android:onClick="onClickBtnKoniec"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="Koniec"
+            android:textSize="24sp"
+            />
+    </LinearLayout>
+</android.support.constraint.ConstraintLayout>

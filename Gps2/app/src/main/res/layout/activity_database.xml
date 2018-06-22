@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".DatabaseActivity">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/selectGPS1"
+                android:onClick="onClickSelectGPS1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Select GPS1"
+                android:textSize="16sp"
+                />
+            <Button
+                android:id="@+id/selectGPS2"
+                android:onClick="onClickSelectGPS2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Select GPS2"
+                android:textSize="16sp"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/selectGPSParam"
+                android:onClick="onClickSelectGPSParam"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Select GPSPARAM"
+                android:textSize="16sp"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/deleteAllGPS"
+                android:onClick="onClickDeleteAllGPS"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Delete all data"
+                android:textSize="16sp"
+                />
+            <Button
+                android:id="@+id/insertPrimaryData"
+                android:onClick="onClickInsertPrimaryData"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Insert test data"
+                android:textSize="16sp"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/createTables"
+                android:onClick="onClickCreateTables"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Create tables"
+                android:textSize="16sp"
+                />
+        </LinearLayout>
+
+        <ScrollView
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/scrollView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:fillViewport="true">
+            <TextView
+                android:id="@+id/textView"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:textSize="16sp"
+                android:layout_margin="1dp"
+                android:scrollbars="vertical"
+                android:text=""
+                />
+        </ScrollView>
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>
